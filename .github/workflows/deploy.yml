@@ -8,7 +8,7 @@ on:
 env:
   TARGET_DIR: '~/${{ github.event.repository.name }}'
 
-# jobs:
+jobs:
 #   docker-hub:
 #     name: Docker Hub Image Push
 #     runs-on: ubuntu-latest
