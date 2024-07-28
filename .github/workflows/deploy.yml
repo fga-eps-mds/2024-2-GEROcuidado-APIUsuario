@@ -19,7 +19,7 @@ jobs:
       - name: Sending Image to Docker Hub
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          image: gerocuidadodev/gerocuidado-usuario-api
+          image: victorjorge/gerocuidado-usuario-api
           registry: docker.io
           directory: ./
           dockerfile: ./Dockerfile.prod
