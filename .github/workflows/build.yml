@@ -7,6 +7,8 @@ on:
       - release-sonar
       - chore/adapt-for-2024-1
       - master
+    tags:
+      - 'v*'
 jobs:
   test-unit:
     name: Test Unit & Scan
