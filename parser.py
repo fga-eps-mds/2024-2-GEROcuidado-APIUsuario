@@ -28,13 +28,13 @@ BASE_URL = "https://sonarcloud.io/api/measures/component_tree?component=fga-eps-
 if __name__ == "__main__":
 
     REPO = sys.argv[1]
-    RELEASE_VERSION = sys.argv[2]
+    RELEASE_VERSION = sys.argv[2].replace('/')
 
     response = requests.get(
         f'{BASE_URL}{REPO}&metricKeys={",".join(METRICS_SONAR)}&ps=500'
     )
     j = json.loads(response.text)
-    
+
     file_path = f'./analytics-raw-data/fga-eps-mds-{REPO}-{TODAY.strftime("%m-%d-%Y-%H-%M-%S")}-{RELEASE_VERSION}.json'
 
     with open(file_path, "w") as fp:
