@@ -9,23 +9,23 @@ env:
   TARGET_DIR: '~/${{ github.event.repository.name }}'
 
 jobs:
-#   docker-hub:
-#     name: Docker Hub Image Push
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Check out code
-#         uses: actions/checkout@v3
+  docker-hub:
+    name: Docker Hub Image Push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
 
-#       - name: Sending Image to Docker Hub
-#         uses: mr-smithers-excellent/docker-build-push@v5
-#         with:
-#           image: victorjorge/gerocuidado-usuario-api
-#           registry: docker.io
-#           directory: ./
-#           dockerfile: ./Dockerfile.prod
-#           tags: latest
-#           username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Sending Image to Docker Hub
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: victorjorge/gerocuidado-usuario-api
+          registry: docker.io
+          directory: ./
+          dockerfile: ./Dockerfile.prod
+          tags: latest
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
   deploy-ec2:
     name: Deploy EC2
