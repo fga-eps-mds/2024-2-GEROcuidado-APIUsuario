@@ -5,8 +5,7 @@ on:
       - main
       - develop
       - release-sonar
-  pull_request:
-    types: [opened, synchronize, reopened]
+      - chore/adapt-for-2024-1
 jobs:
   test-unit:
     name: Test Unit & Scan

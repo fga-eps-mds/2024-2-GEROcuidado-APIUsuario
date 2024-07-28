@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: ['develop']
+    branches: ['develop', 'chore/adapt-for-2024-1']
     tags: ['v*.*.*']
 
 env:
@@ -19,7 +19,7 @@ jobs:
       - name: Sending Image to Docker Hub
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
-          image: gerocuidadodev/gerocuidado-usuario-api
+          image: victorjorge/gerocuidado-usuario-api
           registry: docker.io
           directory: ./
           dockerfile: ./Dockerfile.prod
@@ -44,4 +44,4 @@ jobs:
           script: |
             cd ${{env.TARGET_DIR}}
             sudo git pull
-            sudo docker compose -f docker-compose.prod.yml up --force-recreate --build --pull --remove-orphans -d
+            sudo docker compose -f docker-compose.prod.yml up --force-recreate --build --pull always --remove-orphans -d
