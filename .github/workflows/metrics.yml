@@ -19,7 +19,7 @@ jobs:
         run: mkdir analytics-raw-data
 
       - name: Coletar métricas no SonarCloud
-        run: python parser.py fga-eps-mds-1_2024-1-gerocuidado-apiusuario ${{ github.ref_name }}
+        run: python parser.py fga-eps-mds-1_2024-1-gerocuidado-apiusuario ${{ github.ref_name }} ${{ github.event.repository.name }}
 
       # - name: Envia métricas para repo de Doc
       #   run: |

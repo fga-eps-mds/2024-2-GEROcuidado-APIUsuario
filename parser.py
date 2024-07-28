@@ -29,6 +29,7 @@ if __name__ == "__main__":
 
     REPO_COMPONENT_KEY = sys.argv[1]
     RELEASE_VERSION = sys.argv[2].replace('/', '')
+    REPO = sys.argv[3]
 
     response = requests.get(
         f'{BASE_URL}{REPO_COMPONENT_KEY}&metricKeys={",".join(METRICS_SONAR)}&ps=500'
@@ -38,7 +39,7 @@ if __name__ == "__main__":
 
     j = json.loads(response.text)
 
-    file_path = f'./analytics-raw-data/{REPO_COMPONENT_KEY}-{TODAY.strftime("%m-%d-%Y-%H-%M-%S")}-{RELEASE_VERSION}.json'
+    file_path = f'./analytics-raw-data/{REPO}-{TODAY.strftime("%m-%d-%Y-%H-%M-%S")}-{RELEASE_VERSION}.json'
 
     with open(file_path, "w") as fp:
         fp.write(json.dumps(j))
