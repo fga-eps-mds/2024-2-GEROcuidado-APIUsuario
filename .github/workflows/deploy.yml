@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: ['develop']
+    branches: ['develop', 'chore/adapt-for-2024-1']
     tags: ['v*.*.*']
 
 env:
@@ -27,21 +27,21 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-  deploy-ec2:
-    name: Deploy EC2
-    needs: docker-hub
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout the files
-        uses: actions/checkout@v2
+  # deploy-ec2:
+  #   name: Deploy EC2
+  #   needs: docker-hub
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout the files
+  #       uses: actions/checkout@v2
 
-      - name: Executing remote ssh commands using ssh key
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST_DNS }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd ${{env.TARGET_DIR}}
-            sudo git pull
-            sudo docker compose -f docker-compose.prod.yml up --force-recreate --build --pull --remove-orphans -d
+  #     - name: Executing remote ssh commands using ssh key
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{ secrets.EC2_HOST_DNS }}
+  #         username: ${{ secrets.EC2_USERNAME }}
+  #         key: ${{ secrets.EC2_SSH_KEY }}
+  #         script: |
+  #           cd ${{env.TARGET_DIR}}
+  #           sudo git pull
+  #           sudo docker compose -f docker-compose.prod.yml up --force-recreate --build --pull --remove-orphans -d
