@@ -6,6 +6,7 @@ on:
       - develop
       - release-sonar
       - chore/adapt-for-2024-1
+      - master
 jobs:
   test-unit:
     name: Test Unit & Scan
