@@ -6,8 +6,10 @@ import {
   Param,
   Patch,
   Post,
+  Query
 } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
+import { plainToInstance } from 'class-transformer';
 import { HttpResponse } from '../shared/classes/http-response';
 import { Filtering, Filtrate } from '../shared/decorators/filtrate.decorator';
 import { Ordenate, Ordering } from '../shared/decorators/ordenate.decorator';
@@ -17,6 +19,8 @@ import { Response } from '../shared/interceptors/data-transform.interceptor';
 import { ResponsePaginate } from '../shared/interfaces/response-paginate.interface';
 import { IdValidator } from '../shared/validators/id.validator';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
+import { PullUsuariosQueryParamsDto } from './dto/pull-usuarios-query-params.dto';
+import { PullUsuariosResponseDto, UsuarioDto } from './dto/pull-usuarios-reponse.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
 import { IUsuarioFilter } from './interfaces/usuario-filter.interface';
@@ -24,7 +28,7 @@ import { UsuarioService } from './usuario.service';
 
 @Controller()
 export class UsuarioController {
-  constructor(private readonly _service: UsuarioService) {}
+  constructor(private readonly _service: UsuarioService) { }
 
   @Post()
   @PublicRoute()
@@ -71,5 +75,24 @@ export class UsuarioController {
   @MessagePattern({ role: 'info', cmd: 'getAll' })
   async findAllTCP(data: { ids: number[] }): Promise<Usuario[]> {
     return this._service.findAllToPublicacao(data.ids);
+  }
+
+  @Get('/sync/pull_users')
+  async pullUsers(@Query() queryParam: PullUsuariosQueryParamsDto): Promise<Response<PullUsuariosResponseDto>> {
+    const currentTime = Date.now();
+    const targetTimestamp = new Date(Number(queryParam.lastPulledAt));
+    const createdUsuarios = await this._service.allCreatedUsuariosSince(targetTimestamp);
+    const updatedUsuarios = await this._service.allUpdatedUsuariosSince(targetTimestamp);
+
+    return new HttpResponse({
+      changes: {
+        usuario: {
+          created: plainToInstance(UsuarioDto, createdUsuarios),
+          updated: plainToInstance(UsuarioDto, updatedUsuarios),
+          deleted: []
+        }
+      },
+      timestamp: currentTime
+    }).onSuccess('success');
   }
 }
