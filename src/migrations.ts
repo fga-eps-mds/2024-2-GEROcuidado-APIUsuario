@@ -14,6 +14,7 @@ import { DataSource } from 'typeorm';
     migrationsRun: true,
     logging: true,
     migrations: [__dirname + '/migration/*.js'],
+    // namingStrategy: new SnakeNamingStrategy(), // Here you'r using the strategy!,
   });
 
   await dataSource.initialize();
