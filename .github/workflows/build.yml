@@ -4,11 +4,9 @@ on:
     branches:
       - main
       - develop
-      - release-sonar
-      - chore/adapt-for-2024-1
-      - master
-    tags:
-      - 'v*'
+  pull_request:
+    types: [synchronize, closed]
+
 jobs:
   test-unit:
     name: Test Unit & Scan
