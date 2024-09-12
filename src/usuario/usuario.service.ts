@@ -23,7 +23,7 @@ export class UsuarioService {
     @InjectRepository(Usuario)
     private readonly _repository: Repository<Usuario>,
     private readonly _configService: ConfigService,
-  ) {}
+  ) { }
 
   async create(body: CreateUsuarioDto): Promise<Usuario> {
     const usuario = new Usuario(body);
@@ -105,6 +105,18 @@ export class UsuarioService {
       count: +total,
       pageSize: +total,
     };
+  }
+
+  async allUpdatedUsuariosSince(targetTimestamp: Date): Promise<Usuario[]> {
+    return this._repository.createQueryBuilder('usuario')
+      .where('usuario.updated_at >= :targetTimestamp AND usuario.created_at < :targetTimestamp', { targetTimestamp })
+      .getMany();
+  }
+
+  async allCreatedUsuariosSince(targetTimestamp: Date): Promise<Usuario[]> {
+    return this._repository.createQueryBuilder('usuario')
+      .where('usuario.created_at >= :targetTimestamp', { targetTimestamp })
+      .getMany();
   }
 
   private buildWhereClause(filter: IUsuarioFilter): string {

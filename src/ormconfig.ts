@@ -12,6 +12,8 @@ for (const k in envConfig) {
   process.env[k] = envConfig[k];
 }
 
+const SnakeNamingStrategy = require("typeorm-naming-strategies").SnakeNamingStrategy
+
 const config: DataSourceOptions = {
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
@@ -25,6 +27,7 @@ const config: DataSourceOptions = {
   migrationsRun: true,
   logging: false,
   migrations: [__dirname + '/migration/**/*{.ts,.js}'],
+  namingStrategy: new SnakeNamingStrategy()
 };
 
 export default new DataSource(config);

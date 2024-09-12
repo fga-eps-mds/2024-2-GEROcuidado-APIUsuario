@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: ['develop', 'chore/adapt-for-2024-1']
+    branches: ['develop']
     tags: ['v*.*.*']
 
 env:
