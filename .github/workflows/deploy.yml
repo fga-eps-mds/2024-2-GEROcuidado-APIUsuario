@@ -1,3 +1,11 @@
+# Aqui realizamos o deploy do microserviço fazendo push da imagem docker atualizada
+# com a versão mais recente do código para o Dockerhub. Depois fazemos o deploy no EC2
+# que nada mais é que um git pull e restartar os containers do micro-serviço
+#
+# Nesse mesmo workflow temos a action de release, que cria uma release no github
+# caso seja feito um push de tag com nome no formato vX.Y.Z
+#
+
 name: Deploy
 
 on:
@@ -45,3 +53,18 @@ jobs:
             cd ${{env.TARGET_DIR}}
             sudo git pull
             sudo docker compose -f docker-compose.prod.yml up --force-recreate --build --pull always --remove-orphans -d
+
+  release:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags')
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
