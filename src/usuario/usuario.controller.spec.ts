@@ -21,6 +21,8 @@ describe('UsuarioController', () => {
     senha: '123',
     foto: '1',
     admin: false,
+    created_at: new Date(), // adicione isso
+    updated_at: new Date()
   };
 
   const user = {
