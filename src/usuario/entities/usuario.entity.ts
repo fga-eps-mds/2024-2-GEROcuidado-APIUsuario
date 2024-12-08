@@ -26,7 +26,7 @@ export class Usuario {
   codigoReset?: string;
 
   @Column({nullable: true, type: 'timestamp'})
-  codigoExpiraEm?: Date;
+  codigoResetExpiracao?: Date;
 
   @Column({
     type: 'boolean',

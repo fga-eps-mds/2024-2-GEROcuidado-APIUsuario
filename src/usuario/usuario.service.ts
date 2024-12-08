@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+//import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { Ordering } from '../shared/decorators/ordenate.decorator';
 import { Pagination } from '../shared/decorators/paginate.decorator';
-import { getImageUri } from '../shared/helpers/buffer-to-image';
 import { ResetarSenhaDto } from './dto/resetar-senha.dto';
+import { getImageUri } from '../shared/helpers/buffer-to-image';
 import {
   getWhereClauseIN,
   getWhereClauseNumber,
@@ -39,7 +40,7 @@ export class UsuarioService {
   
     // Atualiza os dados do código no banco
     usuario.codigoReset = codigo;
-    usuario.codigoExpiraEm = expiraEm;
+    usuario.codigoResetExpiracao = expiraEm;
     await this.usuarioRepository.save(usuario);
   
     // Envia o e-mail
@@ -58,8 +59,8 @@ export class UsuarioService {
     // Valida o código e a validade (Código de 6 dígitos em menos de 1 hora)
     if (
       usuario.codigoReset !== codigo ||
-      !usuario.codigoExpiraEm ||
-      usuario.codigoExpiraEm < new Date()
+      !usuario.codigoResetExpiracao ||
+      usuario.codigoResetExpiracao < new Date()
     ) {
       throw new NotFoundException('Código inválido ou expirado');
     }
@@ -70,12 +71,12 @@ export class UsuarioService {
   
     // Remove o código de redefinição
     usuario.codigoReset = undefined;
-    usuario.codigoExpiraEm= undefined;
+    usuario.codigoResetExpiracao= undefined;
   
     await this.usuarioRepository.save(usuario);
   
     return { message: 'Senha redefinida com sucesso' };
-  }  
+  }
 
   async create(body: CreateUsuarioDto): Promise<Usuario> {
     const usuario = new Usuario(body);
