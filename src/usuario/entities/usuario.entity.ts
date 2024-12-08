@@ -22,6 +22,12 @@ export class Usuario {
   })
   senha!: string;
 
+  @Column({ nullable: true})
+  codigoReset?: string;
+
+  @Column({nullable: true, type: 'timestamp'})
+  codigoExpiraEm?: Date;
+
   @Column({
     type: 'boolean',
     default: false,

@@ -8,6 +8,8 @@ import {
   Post,
   Query
 } from '@nestjs/common';
+import { EsqueciSenhaDto } from './dto/esqueci-senha.dto';
+import { ResetarSenhaDto } from './dto/resetar-senha.dto';
 import { MessagePattern } from '@nestjs/microservices';
 import { plainToInstance } from 'class-transformer';
 import { HttpResponse } from '../shared/classes/http-response';
@@ -28,7 +30,20 @@ import { UsuarioService } from './usuario.service';
 
 @Controller()
 export class UsuarioController {
-  constructor(private readonly _service: UsuarioService) { }
+  constructor(private readonly _service: UsuarioService) {}
+
+  // cria a rota nova do esqueci minha senha. Facilita o trabalho no postman -- chama o servi~ço de redefinição.
+  @Post('esqueci-senha')
+  async esqueciSenha(@Body() EsqueciSenhaDto: EsqueciSenhaDto){
+    return this._service.enviarCodigoRedefinicao(EsqueciSenhaDto.email);
+  }
+
+  //cria a nova rota de resetar a senha. Facilita trbalaho no postman -- recebe o email com o token para a senha.
+  @Post('resetar-senha')
+  async resetarSenha(@Body() ResetarSenhaDto: ResetarSenhaDto){
+    return this._service.resetarSenha(ResetarSenhaDto);
+  }
+
 
   @Post()
   @PublicRoute()
