@@ -27,6 +27,7 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
 import { IUsuarioFilter } from './interfaces/usuario-filter.interface';
 import { UsuarioService } from './usuario.service';
+import { BadRequestException } from '@nestjs/common';
 
 @Controller()
 export class UsuarioController {
@@ -34,12 +35,18 @@ export class UsuarioController {
 
   // cria a rota nova do esqueci minha senha. Facilita o trabalho no postman -- chama o servi~ço de redefinição.
   @Post('esqueci-senha')
+  @PublicRoute()
   async esqueciSenha(@Body() EsqueciSenhaDto: EsqueciSenhaDto){
+    if (!EsqueciSenhaDto.email) {
+      throw new BadRequestException('O campo "email" é obrigatório');
+    }
+
     return this._service.enviarCodigoRedefinicao(EsqueciSenhaDto.email);
   }
 
   //cria a nova rota de resetar a senha. Facilita trbalaho no postman -- recebe o email com o token para a senha.
   @Post('resetar-senha')
+  @PublicRoute()
   async resetarSenha(@Body() ResetarSenhaDto: ResetarSenhaDto){
     return this._service.resetarSenha(ResetarSenhaDto);
   }

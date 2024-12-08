@@ -27,6 +27,8 @@
     "typeorm:revert": "npm run typeorm migration:revert -- -d src/ormconfig.ts",
     "typeorm:migrate": "npm run typeorm migration:generate -- -d src/ormconfig.ts",
     "typeorm:run": "./node_modules/.bin/typeorm-ts-node-commonjs migration:run -d src/ormconfig.ts",
+    "migration:up": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/.bin/typeorm migration:run -d src/migration.ts",
+    "migration:down": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/.bin/typeorm migration:revert -d src/migration.ts",
     "schema:drop": "npm run typeorm schema:drop",
     "sonar": "sonar-scanner",
     "schema:sync": "npm run typeorm schema:sync"
@@ -40,7 +42,7 @@
     "@nestjs/core": "9.1.2",
     "@nestjs/jwt": "9.0.0",
     "@nestjs/mapped-types": "1.1.0",
-    "@nestjs/microservices": "9.1.2",
+    "@nestjs/microservices": "9.1.2", 
     "@nestjs/passport": "9.0.3",
     "@nestjs/platform-express": "9.1.2",
     "@nestjs/typeorm": "9.0.1",
@@ -57,6 +59,7 @@
     "express-actuator": "1.8.2",
     "helmet": "6.0.0",
     "jest-sonar-reporter": "^2.0.0",
+    "nodemailer": "^6.9.16",
     "passport": "0.5.2",
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
@@ -64,7 +67,7 @@
     "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
     "rxjs": "7.5.7",
-    "typeorm": "0.3.10",
+    "typeorm": "^0.3.20",
     "typeorm-naming-strategies": "^4.1.0"
   },
   "devDependencies": {
@@ -82,6 +85,7 @@
     "@types/express-actuator": "1.8.0",
     "@types/jest": "^29.5.6",
     "@types/node": "18.17.0",
+    "@types/nodemailer": "^6.4.17",
     "@types/passport-jwt": "3.0.6",
     "@types/passport-local": "1.0.34",
     "@types/supertest": "2.0.11",

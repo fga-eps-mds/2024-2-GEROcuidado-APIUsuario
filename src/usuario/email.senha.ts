@@ -2,15 +2,15 @@ import nodemailer from 'nodemailer';
 
 export async function sendResetEmail(email: string, codigo: string) {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: 'Gmail',
     auth: {
-      user: 'seu-email@gmail.com',
-      pass: 'sua-senha',
+      user: 'gabrielsampaio.fae@gmail.com',
+      pass: 'suasenha', //definir a senha com base na senha do app definida pelo google
     },
   });
 
   const info = await transporter.sendMail({
-    from: '"Sistema" <seu-email@gmail.com>',
+    from: '"Sistema" <gabrielsampaio.fae@gmail.com>',
     to: email,
     subject: 'Redefinição de Senha',
     text: `Seu código de redefinição é: ${codigo}`,

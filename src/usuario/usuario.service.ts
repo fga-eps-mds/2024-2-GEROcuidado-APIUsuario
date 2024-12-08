@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-//import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { Ordering } from '../shared/decorators/ordenate.decorator';
@@ -22,16 +22,24 @@ import { sendResetEmail } from './email.senha';
 @Injectable()
 export class UsuarioService {
   constructor(
+    @InjectRepository(Usuario)
     private readonly _repository: Repository<Usuario>,
     private readonly _configService: ConfigService,
-    private readonly usuarioRepository: Repository<Usuario>, // 
-  ) { }
+  ) { console.log('Repository injetado:', !!this._repository);}
+  
+  async testDbConnection() {
+    const usuarios = await this._repository.find();
+    console.log(usuarios);
+  }  
 
   async enviarCodigoRedefinicao(email: string) {
     // Busca o usuário no banco de dados;
-    const usuario = await this.usuarioRepository.findOne({ where: { email } });
+    const usuario = await this._repository.findOne({ where: { email } });
     if (!usuario) {
       throw new NotFoundException('Usuário não encontrado');
+    }
+    if (!email){
+      throw new BadRequestException('Email não forncedio!');
     }
   
     // Gerar código e validade do token (para ninguém alterar a mesma senha 500x no mesmo email.)
@@ -41,7 +49,7 @@ export class UsuarioService {
     // Atualiza os dados do código no banco
     usuario.codigoReset = codigo;
     usuario.codigoResetExpiracao = expiraEm;
-    await this.usuarioRepository.save(usuario);
+    await this._repository.save(usuario);
   
     // Envia o e-mail
     await sendResetEmail(email, codigo);
@@ -51,7 +59,7 @@ export class UsuarioService {
 
   async resetarSenha({ email, codigo, novaSenha }: ResetarSenhaDto) {
     // Busca o usuário no banco de dados ( talvez precise arrumar)
-    const usuario = await this.usuarioRepository.findOne({ where: { email } });
+    const usuario = await this._repository.findOne({ where: { email } });
     if (!usuario) {
       throw new NotFoundException('Usuário não encontrado');
     }
@@ -73,7 +81,7 @@ export class UsuarioService {
     usuario.codigoReset = undefined;
     usuario.codigoResetExpiracao= undefined;
   
-    await this.usuarioRepository.save(usuario);
+    await this._repository.save(usuario);
   
     return { message: 'Senha redefinida com sucesso' };
   }
