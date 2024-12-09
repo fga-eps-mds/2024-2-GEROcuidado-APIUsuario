@@ -64,8 +64,15 @@ export class UsuarioService {
   }
 
   async update(id: number, body: UpdateUsuarioDto): Promise<Usuario> {
+    let newBody = body;
+
+    if (body.senha) {
+      const hashSenha = await this.hashPassword(body.senha);
+      newBody = { ...body, senha: hashSenha };
+    }
+
     const found = await this.findOne(id);
-    const merged = Object.assign(found, body);
+    const merged = Object.assign(found, newBody);
 
     const updated = await this._repository.save(merged);
 
@@ -108,13 +115,18 @@ export class UsuarioService {
   }
 
   async allUpdatedUsuariosSince(targetTimestamp: Date): Promise<Usuario[]> {
-    return this._repository.createQueryBuilder('usuario')
-      .where('usuario.updated_at >= :targetTimestamp AND usuario.created_at < :targetTimestamp', { targetTimestamp })
+    return this._repository
+      .createQueryBuilder('usuario')
+      .where(
+        'usuario.updated_at >= :targetTimestamp AND usuario.created_at < :targetTimestamp',
+        { targetTimestamp },
+      )
       .getMany();
   }
 
   async allCreatedUsuariosSince(targetTimestamp: Date): Promise<Usuario[]> {
-    return this._repository.createQueryBuilder('usuario')
+    return this._repository
+      .createQueryBuilder('usuario')
       .where('usuario.created_at >= :targetTimestamp', { targetTimestamp })
       .getMany();
   }
