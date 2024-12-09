@@ -1,10 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { Ordering } from '../shared/decorators/ordenate.decorator';
 import { Pagination } from '../shared/decorators/paginate.decorator';
+import { ResetarSenhaDto } from './dto/resetar-senha.dto';
 import { getImageUri } from '../shared/helpers/buffer-to-image';
 import {
   getWhereClauseIN,
@@ -16,6 +17,7 @@ import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
 import { IUsuarioFilter } from './interfaces/usuario-filter.interface';
+import { sendResetEmail } from './email.senha';
 
 @Injectable()
 export class UsuarioService {
@@ -23,7 +25,75 @@ export class UsuarioService {
     @InjectRepository(Usuario)
     private readonly _repository: Repository<Usuario>,
     private readonly _configService: ConfigService,
-  ) { }
+  ) { console.log('Repository injetado:', !!this._repository);}
+  
+  async testDbConnection() {
+    const usuarios = await this._repository.find();
+    console.log(usuarios);
+  }  
+
+  async enviarCodigoRedefinicao(email: string) {
+
+    if (!email){
+      throw new BadRequestException('Email não forncedio!');
+    }
+
+    // Busca o usuário no banco de dados;
+    const usuario = await this._repository.findOne({ where: { email } });
+    if (!usuario) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    // Gerar código e validade do token (para ninguém alterar a mesma senha 500x no mesmo email.)
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString(); 
+    const expiraEm = new Date(Date.now() + 3600000); 
+  
+    // Atualiza os dados do código no banco
+    usuario.codigoReset = codigo;
+    usuario.codigoResetExpiracao = expiraEm;
+    await this._repository.save(usuario);
+  
+    // Envia o e-mail
+    await sendResetEmail(email, codigo);
+  
+    return { message: 'Código enviado para o e-mail' };
+  }  
+
+  async resetarSenha({ email, codigo, novaSenha }: ResetarSenhaDto) {
+    // Busca o usuário no banco de dados ( talvez precise arrumar)
+    const usuario = await this._repository.findOne({ where: { email } });
+    console.log('Email:', email);
+    console.log('Código recebido:', codigo);
+    console.log('Nova senha:', novaSenha);
+    if (!usuario) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+  
+    // Valida o código e a validade (Código de 6 dígitos em menos de 1 hora)
+    if (
+      usuario.codigoReset !== codigo ||
+      !usuario.codigoResetExpiracao ||
+      usuario.codigoResetExpiracao < new Date()
+    ) {
+      console.log('Código enviado:', codigo);
+      console.log('Código armazenado:', usuario.codigoReset);
+      console.log('Expiração armazenada:', usuario.codigoResetExpiracao);
+      console.log('Data atual:', new Date());
+
+      throw new NotFoundException('Código inválido ou expirado');
+    }
+  
+    // Atualiza a senha e cria o hash dessa senha.
+    const senhaHash = await bcrypt.hash(novaSenha, 10);
+    usuario.senha = senhaHash;
+  
+    // Remove o código de redefinição
+    usuario.codigoReset = undefined;
+    usuario.codigoResetExpiracao= undefined;
+  
+    await this._repository.save(usuario);
+  
+    return { message: 'Senha redefinida com sucesso' };
+  }
 
   async create(body: CreateUsuarioDto): Promise<Usuario> {
     const usuario = new Usuario(body);
