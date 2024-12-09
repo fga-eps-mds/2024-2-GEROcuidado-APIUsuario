@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsDateString,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -26,6 +27,15 @@ export class CreateUsuarioDto {
   @IsEmail()
   @MaxLength(100)
   email!: string;
+
+  @IsDateString()
+  @IsNotEmpty()
+  data_nascimento!: Date;
+
+  @IsString()
+  @MaxLength(500)
+  @IsOptional()
+  descricao?: string;
 
   @IsString()
   @IsNotEmpty()
