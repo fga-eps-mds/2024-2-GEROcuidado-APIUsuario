@@ -33,15 +33,16 @@ export class UsuarioService {
   }  
 
   async enviarCodigoRedefinicao(email: string) {
+
+    if (!email){
+      throw new BadRequestException('Email não forncedio!');
+    }
+
     // Busca o usuário no banco de dados;
     const usuario = await this._repository.findOne({ where: { email } });
     if (!usuario) {
       throw new NotFoundException('Usuário não encontrado');
     }
-    if (!email){
-      throw new BadRequestException('Email não forncedio!');
-    }
-  
     // Gerar código e validade do token (para ninguém alterar a mesma senha 500x no mesmo email.)
     const codigo = Math.floor(100000 + Math.random() * 900000).toString(); 
     const expiraEm = new Date(Date.now() + 3600000); 
@@ -60,6 +61,9 @@ export class UsuarioService {
   async resetarSenha({ email, codigo, novaSenha }: ResetarSenhaDto) {
     // Busca o usuário no banco de dados ( talvez precise arrumar)
     const usuario = await this._repository.findOne({ where: { email } });
+    console.log('Email:', email);
+    console.log('Código recebido:', codigo);
+    console.log('Nova senha:', novaSenha);
     if (!usuario) {
       throw new NotFoundException('Usuário não encontrado');
     }
@@ -70,6 +74,11 @@ export class UsuarioService {
       !usuario.codigoResetExpiracao ||
       usuario.codigoResetExpiracao < new Date()
     ) {
+      console.log('Código enviado:', codigo);
+      console.log('Código armazenado:', usuario.codigoReset);
+      console.log('Expiração armazenada:', usuario.codigoResetExpiracao);
+      console.log('Data atual:', new Date());
+
       throw new NotFoundException('Código inválido ou expirado');
     }
   

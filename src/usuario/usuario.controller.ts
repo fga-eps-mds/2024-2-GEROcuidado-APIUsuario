@@ -48,7 +48,8 @@ export class UsuarioController {
   @Post('resetar-senha')
   @PublicRoute()
   async resetarSenha(@Body() ResetarSenhaDto: ResetarSenhaDto){
-    return this._service.resetarSenha(ResetarSenhaDto);
+    console.log('ResetarSenhaDto:', ResetarSenhaDto);
+    return this._service.resetarSenha(ResetarSenhaDto );
   }
 
 
