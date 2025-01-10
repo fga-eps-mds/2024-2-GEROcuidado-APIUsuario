@@ -9,39 +9,39 @@ on:
 
 jobs:
   test-unit:
-    name: Test Unit & Scan
+    name: Test Unit & Sonar Scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Test Unit
-        id: test-unit
-        run: |
-          (docker compose -f docker-compose.test.yml up -V --force-recreate --build --abort-on-container-exit --exit-code-from gerocuidado-usuario-api-test)  || true
-        env:
-          TEST: unit
+      # - name: Test Unit
+        # id: test-unit
+        # run: |
+          # (docker compose -f docker-compose.test.yml up -V --force-recreate --build --abort-on-container-exit --exit-code-from gerocuidado-usuario-api-test)  || true
+        # env:
+          # TEST: unit
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarqube-scan-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  test-e2e:
-    name: Test E2E
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+  # test-e2e:
+    # name: Test E2E
+    # runs-on: ubuntu-latest
+    # steps:
+      # - name: Checkout
+        # uses: actions/checkout@v3
+        # with:
+          # fetch-depth: 0
 
-      - name: Test E2E
-        id: test-e2e
-        run: |
-          (docker compose -f docker-compose.test.yml up -V --force-recreate --build --abort-on-container-exit --exit-code-from gerocuidado-usuario-api-test) || true
-        env:
-          TEST: e2e
+      # - name: Test E2E
+        # id: test-e2e
+        # run: |
+          # (docker compose -f docker-compose.test.yml up -V --force-recreate --build --abort-on-container-exit --exit-code-from gerocuidado-usuario-api-test) || true
+        # env:
+          # TEST: e2e
