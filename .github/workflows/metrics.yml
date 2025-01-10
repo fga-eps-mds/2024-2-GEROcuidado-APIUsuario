@@ -1,6 +1,11 @@
 name: Export de métricas
 
 on:
+  push:
+    branches:
+      - main
+      - develop
+
   pull_request:
     branches:
       - main
