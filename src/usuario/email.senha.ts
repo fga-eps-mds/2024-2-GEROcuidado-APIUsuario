@@ -5,7 +5,7 @@ export async function sendResetEmail(email: string, codigo: string) {
     service: 'Gmail',
     auth: {
       user: 'gabrielsampaio.fae@gmail.com', //inserir email da gerocuidado
-      pass: '', //definir a senha com base na senha do app definida pelo google
+      pass: 'wktc yjut lzvc anda', //definir a senha com base na senha do app definida pelo google
     },
   });
 
