@@ -4,8 +4,9 @@ on:
     branches:
       - main
       - develop
+      - master
   pull_request:
-    types: [synchronize, closed]
+    types: [opened, synchronize, reopened, closed]
 
 jobs:
   test-unit:
