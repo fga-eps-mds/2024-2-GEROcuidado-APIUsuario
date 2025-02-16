@@ -110,6 +110,17 @@ describe('UsuarioController', () => {
     expect(response.message).toBe('Código enviado');
   });
 
+  it('should throw BadRequestException if email is missing in esqueciSenha', async () => {
+    const dto: EsqueciSenhaDto = { email: '' };  // email vazio para forçar a exceção
+    try {
+      await controller.esqueciSenha(dto);
+    } catch (e: unknown) {
+      const error = e as any;
+      expect(error.response.statusCode).toBe(400);  // Exceção esperada (BadRequest)
+      expect(error.response.message).toBe('O campo "email" é obrigatório');
+    }
+  });
+
   it('should handle resetarSenha request', async () => {
     const resetDto: ResetarSenhaDto = { email: 'hacmelo@example.com', codigo: '123456', novaSenha: 'novaSenha123' };
 
@@ -119,6 +130,17 @@ describe('UsuarioController', () => {
 
     expect(service.resetarSenha).toHaveBeenCalledWith(resetDto);
     expect(response.message).toBe('Senha redefinida');
+  });
+
+  it('should throw BadRequestException if email is missing in resetarSenha', async () => {
+    const dto: ResetarSenhaDto = { email: '', codigo: '123456', novaSenha: 'novaSenha123' };
+    try {
+      await controller.esqueciSenha(dto);
+    } catch (e: unknown) {
+      const error = e as any;
+      expect(error.response.statusCode).toBe(400);
+      expect(error.response.message).toBe('O campo "email" é obrigatório');
+    }
   });
 
   describe('findAll', () => {
