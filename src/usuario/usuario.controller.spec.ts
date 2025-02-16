@@ -1,11 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Buffer } from 'buffer';
 import { Filtering } from '../shared/decorators/filtrate.decorator';
 import { OrderParams, Ordering } from '../shared/decorators/ordenate.decorator';
 import {
   Pagination,
   PaginationParams,
 } from '../shared/decorators/paginate.decorator';
+import { EsqueciSenhaDto } from './dto/esqueci-senha.dto';
+import { ResetarSenhaDto } from './dto/resetar-senha.dto';
 import { Usuario } from './entities/usuario.entity';
 import { IUsuarioFilter } from './interfaces/usuario-filter.interface';
 import { UsuarioController } from './usuario.controller';
@@ -22,7 +25,9 @@ describe('UsuarioController', () => {
     foto: '1',
     admin: false,
     created_at: new Date(), // adicione isso
-    updated_at: new Date()
+    updated_at: new Date(),
+    descricao: 'Descrição do usuário',
+    data_nascimento: new Date()
   };
 
   const user = {
@@ -45,6 +50,8 @@ describe('UsuarioController', () => {
             update: jest.fn(),
             findAll: jest.fn(),
             findAllToPublicacao: jest.fn(),
+            enviarCodigoRedefinicao: jest.fn(),
+            resetarSenha: jest.fn(),
           },
         },
         {
@@ -91,6 +98,27 @@ describe('UsuarioController', () => {
     const response = await controller.update({ id: 1 }, { nome: 'Henrique' });
     expect(response.data).toEqual(user);
     expect(response.message).toEqual('Atualizado com sucesso!');
+  });
+
+  it('should handle esqueciSenha request', async () => {
+    jest.spyOn(service, 'enviarCodigoRedefinicao').mockResolvedValue({ message: 'Código enviado' });
+
+    const dto: EsqueciSenhaDto = { email: 'hacmelo@example.com' };
+    const response = await controller.esqueciSenha(dto);
+
+    expect(service.enviarCodigoRedefinicao).toHaveBeenCalledWith(dto.email);
+    expect(response.message).toBe('Código enviado');
+  });
+
+  it('should handle resetarSenha request', async () => {
+    const resetDto: ResetarSenhaDto = { email: 'hacmelo@example.com', codigo: '123456', novaSenha: 'novaSenha123' };
+
+    jest.spyOn(service, 'resetarSenha').mockResolvedValue({ message: 'Senha redefinida' });
+
+    const response = await controller.resetarSenha(resetDto);
+
+    expect(service.resetarSenha).toHaveBeenCalledWith(resetDto);
+    expect(response.message).toBe('Senha redefinida');
   });
 
   describe('findAll', () => {
